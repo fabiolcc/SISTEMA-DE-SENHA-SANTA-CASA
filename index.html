@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senha - Santa Casa</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        .barraSuperior {
+            background-color: #b31500;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .senhaAtualNumero {
+            font-size: 80px;
+            font-weight: bold;
+            color: #eb0a60;
+            animation: pulse 2s infinite;
+        }
+
+        .ultimaSenha {
+            background-color: #e9ecef;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        .btn-primary {
+            background-color: #ff3300;
+            border-color: #ff0000;
+        }
+
+        .historial {
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .historial ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .historial li {
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .senhaAtualNumero {
+                font-size: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Barra superior -->
+        <div class="row barraSuperior">
+            <div class="col-12 text-center">
+                <h1>ATENDIMENTO SANTA CASA DE CAFELÂNDIA</h1>
+                <p>COMPARECER NA SALA DE TRIAGEM</p>
+            </div>
+        </div>
+
+        <!-- Senha Atual -->
+        <div class="row text-center senhaAtual mt-5">
+            <h2>SENHA ATUAL</h2>
+            <h1 id="senhaAtualNumero" class="display-1">0000</h1>
+        </div>
+
+        <!-- Última Senha -->
+        <div class="row ultimaSenha text-center">
+            <h4>ÚLTIMA CHAMADA</h4>
+            <p>Senha: <span id="ultimaSenhaNumero">0000</span></p>
+        </div>
+
+        <!-- Histórico das Últimas 5 Senhas -->
+        <div class="historial">
+            <h4>Últimas Senhas Chamadas</h4>
+            <ul id="historicoSenhas">
+                <!-- Senhas serão inseridas aqui -->
+            </ul>
+        </div>
+
+        <!-- Botão para chamar a próxima senha -->
+        <div class="row text-center mt-4">
+            <div class="col-12">
+                <button class="btn btn-primary" onclick="chamarProximaSenha()">Chamar Próxima Senha</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audioChamada" src="audio/chamada.wav" preload="auto"></audio>
+
+    <script>
+        let numeroSenhaAtual = 0;
+        let historico = [];
+
+        // Função para transformar texto em fala
+        function falarTexto(texto) {
+            if ('speechSynthesis' in window) {
+                const synth = window.speechSynthesis;
+                const utterance = new SpeechSynthesisUtterance(texto);
+                utterance.lang = 'pt-BR'; // Configurado para Português do Brasil
+                synth.speak(utterance);
+            } else {
+                alert('Seu navegador não suporta conversão de texto para fala.');
+            }
+        }
+
+        // Função para chamar a próxima senha
+        function chamarProximaSenha() {
+            numeroSenhaAtual++;
+            const senhaAtual = numeroSenhaAtual.toString().padStart(4, '0'); // Formata a senha para 4 dígitos
+            document.getElementById('senhaAtualNumero').innerText = senhaAtual;
+            document.getElementById('ultimaSenhaNumero').innerText = senhaAtual;
+
+            // Adiciona a senha ao histórico
+            historico.push(senhaAtual);
+            if (historico.length > 5) {
+                historico.shift(); // Remove a senha mais antiga se tiver mais de 5
+            }
+
+            // Atualiza o histórico de senhas chamadas
+            atualizarHistorico();
+
+            // Texto que será falado
+            const mensagem = `Senha número ${numeroSenhaAtual}, comparecer na sala de triagem.`;
+            
+            // Reproduz o sinal sonoro
+            document.getElementById('audioChamada').play();
+
+            // Chama a voz
+            falarTexto(mensagem);
+        }
+
+        // Função para atualizar o histórico de senhas chamadas
+        function atualizarHistorico() {
+            const ul = document.getElementById('historicoSenhas');
+            ul.innerHTML = ''; // Limpa a lista antes de atualizá-la
+            historico.forEach(senha => {
+                const li = document.createElement('li');
+                li.textContent = `Senha: ${senha}`;
+                ul.appendChild(li);
+            });
+        }
+
+    </script>
+
+    <!-- Scripts Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
